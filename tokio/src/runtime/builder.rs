@@ -464,8 +464,13 @@ cfg_rt_threaded! {
             use crate::runtime::{Kind, ThreadPool};
             use crate::runtime::park::Parker;
 
-            let core_threads = self.core_threads.unwrap_or_else(crate::loom::sys::num_cpus);
-            assert!(core_threads <= self.max_threads, "Core threads number cannot be above max limit");
+            let core_threads = match self.core_threads {
+                Some(core_threads) => {
+                    assert!(core_threads <= self.max_threads, "Core threads number cannot be above max limit");
+                    core_threads
+                },
+                None => core::cmp::min(crate::loom::sys::num_cpus(), self.max_threads)
+            };
 
             let clock = time::create_clock();
 

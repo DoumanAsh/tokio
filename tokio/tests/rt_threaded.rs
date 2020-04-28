@@ -25,6 +25,15 @@ fn single_thread() {
 }
 
 #[test]
+fn should_not_panic_on_smol_max_thread() {
+    let _ = runtime::Builder::new()
+        .threaded_scheduler()
+        .enable_all()
+        .max_threads(1)
+        .build();
+}
+
+#[test]
 fn many_oneshot_futures() {
     // used for notifying the main thread
     const NUM: usize = 1_000;
